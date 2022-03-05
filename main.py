@@ -11,7 +11,7 @@ from string import digits
 
 # Create today event for general embed information
 today = date.today()
-currentTime = datetime.utcnow()
+current_time = datetime.utcnow()
 
 # Enable Stripe system (if enabled)
 if Config.stripe['enabled']:
@@ -33,8 +33,8 @@ class StartBot(commands.Bot):
             self.add_view(DonationView())
             self.persistent_views_added = True
         print(f"We have logged in as {bot.user}")
-        if Config.botStatus['enabled']:
-            await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=Config.botStatus['message']), status=Config.botStatus['status'])
+        if Config.bot_status['enabled']:
+            await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=Config.bot_status['message']), status=Config.bot_status['status'])
 
 class PersistentVerification(discord.ui.View):
     def __init__(self):
@@ -43,8 +43,8 @@ class PersistentVerification(discord.ui.View):
     @discord.ui.button(custom_id='persistent_view:verification', label='Verify', style=discord.ButtonStyle.gray)
     async def verification(self, button: discord.ui.Button, interaction: discord.Interaction):
         guild = bot.get_guild(Config.guild)
-        unverified = guild.get_role(Config.verificationSystem['unverifiedRole'])
-        verified = guild.get_role(Config.verificationSystem['verifiedRole'])
+        unverified = guild.get_role(Config.verification_system['unverifiedRole'])
+        verified = guild.get_role(Config.verification_system['verifiedRole'])
         member = guild.get_member(interaction.user.id)
 
         if verified is None or unverified is None:
@@ -82,9 +82,9 @@ if Config.stripe['enabled']:
             stripe.Invoice.finalize_invoice(invoice.id)
             redirect = stripe.Invoice.retrieve(invoice.id)
 
-            embedVar = await embedBuilder("Donation Page Created", f"Your donation has been setup. Please click the button below to complete your donation for the amount of ${amount}.")
+            embed = await embed_builder("Donation Page Created", f"Your donation has been setup. Please click the button below to complete your donation for the amount of ${amount}.")
             view = await createLinkButton("Finalize Donation", f"{redirect.hosted_invoice_url}")
-            await interaction.user.send(embed=embedVar, view=view)
+            await interaction.user.send(embed=embed, view=view)
             await interaction.response.send_message(f"Check your DMs to complete your donation of ${self.values[0]}", ephemeral=True)
 
     class DonationView(discord.ui.View):
@@ -98,132 +98,132 @@ bot = StartBot()
 
 @bot.event
 async def on_member_join(member):
-    # If welcomeChannel module is enabled
-    if Config.welcomeChannel['enabled']:
+    # If welcome_channel module is enabled
+    if Config.welcome_channel['enabled']:
         date = member.created_at
-        embedVar = await embedBuilder("Welcome User!", f"<@{member.id}> ({member.display_name}#{member.discriminator}) has joined the server.\n\n**Account Age**:\n{date.strftime('%x')}, {date.strftime('%X')}", thumbnail = True, footer = True)
-        welcomeChannel = bot.get_channel(Config.welcomeChannel['channelID'])
+        embed = await embed_builder("Welcome User!", f"<@{member.id}> ({member.display_name}#{member.discriminator}) has joined the server.\n\n**Account Age**:\n{date.strftime('%x')}, {date.strftime('%X')}", thumbnail = True, footer = True)
+        welcome_channel = bot.get_channel(Config.welcome_channel['channelID'])
 
-        await welcomeChannel.send(embed=embedVar)
+        await welcome_channel.send(embed=embed)
 
-        # If welcomeChannel module doesn't have a default role and the verificationSystem module is enable
-        if not Config.welcomeChannel['defaultRole'] and Config.verificationSystem['enabled'] == True:
+        # If welcome_channel module doesn't have a default role and the verification_system module is enable
+        if not Config.welcome_channel['defaultRole'] and Config.verification_system['enabled'] == True:
             # Add unverifiedRole
-            role = discord.utils.get(bot.get_guild(member.guild.id).roles, id=Config.verificationSystem['unverifiedRole'])
+            role = discord.utils.get(bot.get_guild(member.guild.id).roles, id=Config.verification_system['unverifiedRole'])
             await member.add_roles(role)
 
             # Send private message to user to verify themselves
-            embedVar = await embedBuilder("Verify Yourself", f"To get access to the server, you need to verify yourself. Please click the button below to continue.", thumbnail = True, footer = True)
-            await member.send(embed=embedVar, view=PersistentVerification())
-        # If welcomeChannel module does have a default role or the verificationSystem module is disabled
+            embed = await embed_builder("Verify Yourself", f"To get access to the server, you need to verify yourself. Please click the button below to continue.", thumbnail = True, footer = True)
+            await member.send(embed=embed, view=PersistentVerification())
+        # If welcome_channel module does have a default role or the verification_system module is disabled
         else:
-            role = discord.utils.get(bot.get_guild(member.guild.id).roles, id=Config.welcomeChannel['defaultRole'])
+            role = discord.utils.get(bot.get_guild(member.guild.id).roles, id=Config.welcome_channel['defaultRole'])
             await member.add_roles(role)
 
 @bot.event
 async def on_message(message):
     if len(message.content) > 0:
         if str(message.content[0]) != str(Config.prefix):
-            badWord = any(word.lower() in message.content.lower() for word in Config.filtered)
-            if badWord and not message.author.get_role(Config.adminRole):
+            bad_word = any(word.lower() in message.content.lower() for word in Config.filtered)
+            if bad_word and not message.author.get_role(Config.admin_role):
                 await message.delete()
         else:
             await bot.process_commands(message)
 
 @bot.command(name="embed", alias="sayem")
 async def embed(ctx, *, embed = ""):
-    if ctx.author.get_role(Config.adminRole):
+    if ctx.author.get_role(Config.admin_role):
         await ctx.message.delete()
         if not embed:
-            await showTemporaryMessage(ctx, "Empty Embed", "No embed was provided. Please try again.")
+            await show_temporary_message(ctx, "Empty Embed", "No embed was provided. Please try again.")
         else:
-            embed = await embedBuilder("", embed, member = ctx.author)
+            embed = await embed_builder("", embed, member = ctx.author)
             await ctx.send(embed=embed)
     else:
-        await permissionDenied(ctx)
+        await permission_denied(ctx)
 
 @bot.command(name="timeout", alias="mute")
 async def timeout(ctx, member: discord.Member, time = "", *, reason = ""):
-    if ctx.author.get_role(Config.adminRole):
+    if ctx.author.get_role(Config.admin_role):
         await ctx.message.delete()
 
         if not time:
-            await showTemporaryMessage(ctx, "No Time", "No time was set for the timeout. Please try again.")
+            await show_temporary_message(ctx, "No Time", "No time was set for the timeout. Please try again.")
         else:
             length = ''.join(i for i in time if not i.isdigit())
-            timeInt = [int(word) for word in list(time) if word.isdigit()]
+            time_int = [int(word) for word in list(time) if word.isdigit()]
             match length.lower():
                 case 'm':
-                    duration = currentTime + timedelta(minutes=timeInt[0])
+                    duration = current_time + timedelta(minutes=time_int[0])
                 case 'h':
-                    duration = currentTime + timedelta(hours=timeInt[0])
+                    duration = current_time + timedelta(hours=time_int[0])
                 case _:
-                    duration = currentTime + timedelta(minutes=timeInt[0])
+                    duration = current_time + timedelta(minutes=time_int[0])
             
             await member.timeout(duration, reason=reason)
-            await showTemporaryMessage(ctx, "User Timed out", f"{member.mention} was timed out.")
+            await show_temporary_message(ctx, "User Timed out", f"{member.mention} was timed out.")
     else:
-        await permissionDenied(ctx)
+        await permission_denied(ctx)
 
 @bot.command(name="kick", alias="remove")
 async def kick(ctx, member: discord.Member, *, reason = ""):
-    if ctx.author.get_role(Config.adminRole):
+    if ctx.author.get_role(Config.admin_role):
         await ctx.message.delete()
         await member.kick(reason=reason)
-        await showTemporaryMessage(ctx, "User Kicked", f"{member.mention} was kicked.")
+        await show_temporary_message(ctx, "User Kicked", f"{member.mention} was kicked.")
     else:
-        await permissionDenied(ctx)
+        await permission_denied(ctx)
 
 @bot.command(name="ban", alias="perm")
 async def ban(ctx, member: discord.Member, *, reason = ""):
-    if ctx.author.get_role(Config.adminRole):
+    if ctx.author.get_role(Config.admin_role):
         await ctx.message.delete()
         await member.ban(reason=reason)
-        await showTemporaryMessage(ctx, "User Banned", f"{member.mention} was banned.")
+        await show_temporary_message(ctx, "User Banned", f"{member.mention} was banned.")
     else:
-        await permissionDenied(ctx)
+        await permission_denied(ctx)
 
 @bot.command(name="purge", alias="clear")
 async def clear(ctx, amount: int):
-    if ctx.author.get_role(Config.adminRole):
+    if ctx.author.get_role(Config.admin_role):
         await ctx.message.delete()
         await ctx.channel.purge(limit=amount)
 
-        await showTemporaryMessage(ctx, "Channel Cleared", f"The last **{amount}** messages in this channel have been removed.")
+        await show_temporary_message(ctx, "Channel Cleared", f"The last **{amount}** messages in this channel have been removed.")
     else:
-        await permissionDenied(ctx)
+        await permission_denied(ctx)
 
 if Config.stripe['enabled']:
     @bot.command()
     async def createDonation(ctx, channel: discord.TextChannel, *, body = ""):
-        if ctx.author.get_role(Config.adminRole):
+        if ctx.author.get_role(Config.admin_role):
             await ctx.message.delete()
             if not body:
-                await showTemporaryMessage(ctx, "No Body Provided", "No body was provided for the creation of the embed. Please try again.")
+                await show_temporary_message(ctx, "No Body Provided", "No body was provided for the creation of the embed. Please try again.")
             else:
-                embed = await embedBuilder(f"{Config.name} Donations", body)
+                embed = await embed_builder(f"{Config.name} Donations", body)
                 await channel.send(embed=embed, view=DonationView())
         else:
-            await permissionDenied(ctx)
+            await permission_denied(ctx)
 
 # Function to show permission denied
-async def permissionDenied(ctx):
+async def permission_denied(ctx):
     await ctx.message.delete()
 
-    embed = await embedBuilder("Permission Denied", "You're not allowed to perform this action.")
+    embed = await embed_builder("Permission Denied", "You're not allowed to perform this action.")
     message = await ctx.send(embed=embed)
     time.sleep(5)
     await message.delete()
 
 # Function to show temporary message
-async def showTemporaryMessage(ctx, title, content):
-    embed = await embedBuilder(title, content, footer = False)
+async def show_temporary_message(ctx, title, content):
+    embed = await embed_builder(title, content, footer = False)
     message = await ctx.send(embed=embed)
     time.sleep(10)
     await message.delete()
 
 # Function for building embeds
-async def embedBuilder(title, description, member = "", thumbnail = False, footer = True):
+async def embed_builder(title, description, member = "", thumbnail = False, footer = True):
     embed = discord.Embed(title=title, description=description, color=discord.Color.from_rgb(18,95,217))
     if footer:
         embed.set_footer(text=f"© {Config.name} {today.strftime('%Y')} • {today.strftime('%m/%d/%Y')}")
@@ -239,8 +239,8 @@ async def askQuestion(ctx, channel, question):
     def check(m):
         return m.author.id == ctx.author.id and m.channel.id == ctx.channel.id
 
-    embedVar = await embedBuilder("", question, False, False)
-    msg = await channel.send(embed=embedVar)
+    embed = await embed_builder("", question, False, False)
+    msg = await channel.send(embed=embed)
     response = await bot.wait_for(event = 'message', check = check, timeout = 60.0)
     await response.delete()
     await msg.delete()

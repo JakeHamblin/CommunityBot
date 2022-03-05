@@ -6,7 +6,7 @@ class Config:
     logo = "https://your.tld/image.png"
 
     # User IDs for people allowed to access administrative commands in bot
-    adminRole = 1234567890
+    admin_role = 1234567890
 
     filtered = [
         "word1",
@@ -14,19 +14,19 @@ class Config:
         "word3",
     ]
 
-    botStatus = {
+    bot_status = {
         "enabled": True,
         "status": "dnd",
         "message": "Community Name",
     }
 
-    welcomeChannel = {
+    welcome_channel = {
         "enabled": True,
         "channelID": 1234567890,
         "defaultRole": False, # Set to False if you've enabled the verification system
     }
 
-    verificationSystem = {
+    verification_system = {
         "enabled": True,
         "unverifiedRole": 1234567890,
         "verifiedRole": 1234567890,
