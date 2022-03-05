@@ -1,5 +1,5 @@
 # Community Bot
-PyCord bot created in Python for use in FiveM communities, providing some functions that are often used in FiveM communities.
+PyCord bot created in Python for use in FiveM communities, providing some functions that are often used in gaming communities.
 
 ## Usage
 This bot runs on Python 3.10, along with PyCord v2.0 (last tested to work on [PyCord](https://github.com/Pycord-Development/pycord) v2.0.0b4. Below, you will find the steps for how to setup the bot depending on your specific usage
