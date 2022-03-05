@@ -255,3 +255,5 @@ async def createLinkButton(label, url):
     return view
 
 bot.run(Config.token)
+
+# sorry this bot is such shit - yek-el-fuck
