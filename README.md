@@ -20,11 +20,11 @@ python3 -m pip install -U .[voice]
 The bot comes with an easily configurable config file. However, since some people aren't the best at understanding config files, I've attached comments into the config that explain what everything means and how to use it.
 
 ### Credits
-- Hyperz - Showing me how bad of a developer Discord.js makes you
+- Hyperz - Showing me how bad of a developer Discord.js makes you<br><br>
 
-###### Hosting Companies
-Are you a hosting company that wants to support my repositories? If so, feel free to contact me by either my [Discord](https://jakehamblin.com/discord) or [email](mailto:jake@jakehamblin.com).
+<p align="center">
+ <img src="https://jakehamblin.com/images/hosturly.png">
+</p>
 
-<!---![Hosting Company](https://jakehamblin.com/images/snowside/header.png)
 ### Hosting Company
-Want some of the best hosting in the business? Come to Hosting Company. Hosting Company has enterprise grade hardware with 10Gbps networking available with VPSes starting at just $3.50/month. Check them out [here](https://hostingcompany.com)--->
+Are you looking for a reliable and affordable host? Well, with many years of experience working with websites, website hosting, and dedicated server hosting, I can say that I've got a pretty good idea when a host is good. [Hosturly](https://jakehamblin.com/hosturly) is up for the task. Don't trust me? Read their reviews. They've got an almost 5 star rating, and with many years in the industry, they're here to stay. Use code `JAKE` for 10% off your order.
